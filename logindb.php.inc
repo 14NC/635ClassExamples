@@ -26,7 +26,26 @@ class loginDB
    }
 
    public function updateUserPassword($username,$oldPassword,$newPassword)
-   {}
+   {
+   	if (!$this->validateUser($username,$oldPassword))
+        {
+		echo "cannot update Password, validation failed".PHP_EOL;
+		$response = array(
+			"message"=>"cannot update password, validation failed",
+			"result"=>"false");
+		return $response;
+        }
+	$username = $this->db->real_escape_string($username);
+	$password = $this->db->real_escape_string($this->saltPassword($newPassword));
+	$query = "update login set password = '$password' where username ='$username');";
+	$results = $this->db->query($query);
+	if ($this->db->errno > 0)
+        {
+		echo "DB error: ".$this->db->error.PHP_EOL;
+		return false;
+        }
+	return true;
+   }
    public function checkUserPrivilegeLevel($username)
    {}
    public function disableUserAccount($username)
